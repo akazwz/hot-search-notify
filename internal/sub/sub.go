@@ -2,7 +2,9 @@ package sub
 
 import (
 	"encoding/json"
+	"github.com/akazwz/hot-search-notify/inital"
 	"github.com/akazwz/hot-search-notify/internal/utils"
+	"github.com/akazwz/hot-search-notify/model"
 	"io"
 	"io/ioutil"
 	"log"
@@ -34,12 +36,19 @@ type SingleHotSearch struct {
 func NotifySub() {
 	allSubWordsArr := utils.GetAllSubWords()
 	log.Println("所有订阅词汇:", allSubWordsArr)
-	wordsAndContents := GetFilterSubWordsAndContents(allSubWordsArr)
-	log.Println(wordsAndContents)
+	wordsAndContentsMap, subWords := GetFilterSubWordsAndContents(allSubWordsArr)
+	log.Println(wordsAndContentsMap)
+	log.Println(subWords)
+	var subModels model.Sub
+	for i := 0; i < len(subWords); i++ {
+		inital.GDB.Raw(`SELECT * FROM sub WHERE JSON_CONTAINS(sub_words, ?)`, "\""+subWords[i]+"\"").Scan(&subModels)
+		log.Println(subModels)
+	}
+
 }
 
 // GetFilterSubWordsAndContents 传入所有的订阅词汇, 返回符合的订阅词汇和热搜内容
-func GetFilterSubWordsAndContents(subWordsArr []string) map[string][]string {
+func GetFilterSubWordsAndContents(subWordsArr []string) (map[string][]string, []string) {
 	// 请求接口,获取当前热搜
 	response, err := http.Get("https://hs.hellozwz.com/hot-searches/current")
 	if err != nil {
@@ -81,12 +90,16 @@ func GetFilterSubWordsAndContents(subWordsArr []string) map[string][]string {
 		for j := 0; j < len(filterWordsArr); j++ {
 			isContains := strings.Contains(contentsArr[i], filterWordsArr[j])
 			if isContains {
-				filterWordContentsMap[filterWordsArr[j]] = []string{contentsArr[i]}
+				// map key 存在
+				if _, ok := filterWordContentsMap[filterWordsArr[j]]; ok {
+					filterWordContentsMap[filterWordsArr[j]] = append(filterWordContentsMap[filterWordsArr[j]], contentsArr[i])
+				} else {
+					filterWordContentsMap[filterWordsArr[j]] = []string{contentsArr[i]}
+				}
 			}
 		}
 	}
-
-	return filterWordContentsMap
+	return filterWordContentsMap, filterWordsArr
 }
 
 // 获取热搜包含的订阅词汇

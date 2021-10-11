@@ -27,6 +27,5 @@ func main() {
 		fmt.Println("数据库连接失败")
 		return
 	}
-
 	sub.NotifySub()
 }
