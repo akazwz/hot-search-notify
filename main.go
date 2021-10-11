@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/akazwz/hot-search-notify/init"
+	"github.com/akazwz/hot-search-notify/inital"
+	"github.com/akazwz/hot-search-notify/utils"
 	"io"
 	"io/ioutil"
 	"log"
@@ -35,8 +36,8 @@ type SingleHotSearch struct {
 func main() {
 	fmt.Println("hello, notify")
 
-	init.VP = init.InitViper()
-	if init.VP == nil {
+	inital.VP = inital.InitViper()
+	if inital.VP == nil {
 		fmt.Println("配置文件初始化失败")
 	}
 
@@ -87,6 +88,7 @@ func main() {
 		}
 	}
 	log.Println(filterWordsArr)
+	utils.GetAllSubWords()
 }
 
 func contentsProgress(subWordsArr, contentsArr []string) []string {

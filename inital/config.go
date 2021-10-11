@@ -1,4 +1,4 @@
-package init
+package inital
 
 type Conf struct {
 	Username string `yaml:"username"`
