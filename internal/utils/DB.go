@@ -1,20 +1,17 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/akazwz/hot-search-notify/inital"
 	"github.com/akazwz/hot-search-notify/model"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"strings"
 )
 
-func GetAllSubWords() {
-	var result []model.Sub
-	inital.GDB.Raw("SELECT * FROM sub").Scan(&result)
-	fmt.Println(result)
+func GetAllSubWords() []string {
 	var allWords string
 	inital.GDB.Raw("SELECT GROUP_CONCAT(sub_word) FROM all_sub_words").Scan(&allWords)
-	fmt.Println(allWords)
+	return strings.Split(allWords, ",")
 }
 
 func CreateSubWords() {
