@@ -2,8 +2,10 @@ package inital
 
 import (
 	"fmt"
+	"github.com/akazwz/hot-search-notify/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 )
 
 func InitDB() *gorm.DB {
@@ -27,5 +29,15 @@ func InitDB() *gorm.DB {
 		//sqlDB.SetMaxIdleConns()
 		//sqlDB.SetMaxIdleConns()
 		return db
+	}
+}
+
+func CreateTables(db *gorm.DB) {
+	err := db.AutoMigrate(
+		model.Sub{},
+		model.AllSubWords{},
+	)
+	if err != nil {
+		log.Println("create table error")
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"github.com/akazwz/hot-search-notify/inital"
@@ -42,8 +43,17 @@ func main() {
 	}
 
 	inital.GDB = inital.InitDB()
-	if inital.VP == nil {
+	if inital.GDB != nil {
+		inital.CreateTables(inital.GDB)
+		db, _ := inital.GDB.DB()
+		defer func(db *sql.DB) {
+			err := db.Close()
+			if err != nil {
+			}
+		}(db)
+	} else {
 		fmt.Println("数据库连接失败")
+		return
 	}
 
 	utils.GetAllSubWords()
