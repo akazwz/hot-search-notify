@@ -34,22 +34,19 @@ type SingleHotSearch struct {
 func NotifySub() {
 	allSubWordsArr := utils.GetAllSubWords()
 	log.Println("所有订阅词汇:", allSubWordsArr)
-	filterWordsArr, filterContentArr := GetFilterSubWordsAndContents(allSubWordsArr)
-	log.Println("符合订阅词汇:", filterWordsArr)
-	log.Println("符合热搜内容:", filterContentArr)
+	wordsAndContents := GetFilterSubWordsAndContents(allSubWordsArr)
+	log.Println(wordsAndContents)
 }
 
 // GetFilterSubWordsAndContents 传入所有的订阅词汇, 返回符合的订阅词汇和热搜内容
-func GetFilterSubWordsAndContents(subWordsArr []string) (filterWordsArr, filterContentArr []string) {
+func GetFilterSubWordsAndContents(subWordsArr []string) map[string][]string {
 	// 请求接口,获取当前热搜
 	response, err := http.Get("https://hs.hellozwz.com/hot-searches/current")
 	if err != nil {
 		log.Println("请求失败")
-		return
 	}
 	if response.StatusCode != http.StatusOK {
 		log.Println("请求失败")
-		return
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
@@ -60,14 +57,12 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (filterWordsArr, filterC
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		log.Println("read error")
-		return
 	}
 	// json 结构到 res
 	res := Res{}
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		log.Println("json error")
-		return
 	}
 	// 热搜数组
 	searches := res.Data.Searches
@@ -78,18 +73,20 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (filterWordsArr, filterC
 		contentsArr = append(contentsArr, content)
 	}
 	// 热搜包含的订阅词汇
-	filterWordsArr = getFilterWords(subWordsArr, contentsArr)
+	filterWordsArr := getFilterWords(subWordsArr, contentsArr)
+	log.Println("符合条件订阅词汇:", filterWordsArr)
 	// 符合订阅的热搜内容
-	filterContentArr = make([]string, 0)
+	filterWordContentsMap := make(map[string][]string)
 	for i := 0; i < len(contentsArr); i++ {
 		for j := 0; j < len(filterWordsArr); j++ {
 			isContains := strings.Contains(contentsArr[i], filterWordsArr[j])
 			if isContains {
-				filterContentArr = append(filterContentArr, contentsArr[i])
+				filterWordContentsMap[filterWordsArr[j]] = []string{contentsArr[i]}
 			}
 		}
 	}
-	return
+
+	return filterWordContentsMap
 }
 
 // 获取热搜包含的订阅词汇

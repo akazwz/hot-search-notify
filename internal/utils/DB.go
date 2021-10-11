@@ -14,6 +14,10 @@ func GetAllSubWords() []string {
 	return strings.Split(allWords, ",")
 }
 
+func GetFilterUserInfo() {
+
+}
+
 func CreateSubWords() {
 	err := inital.GDB.Create(&model.Sub{
 		UserId:   111,
