@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/akazwz/hot-search-notify/init"
 	"io"
 	"io/ioutil"
 	"log"
@@ -33,6 +34,12 @@ type SingleHotSearch struct {
 
 func main() {
 	fmt.Println("hello, notify")
+
+	init.VP = init.InitViper()
+	if init.VP == nil {
+		fmt.Println("配置文件初始化失败")
+	}
+
 	response, err := http.Get("https://hs.hellozwz.com/hot-searches/current")
 	if err != nil {
 		log.Println("请求失败")
