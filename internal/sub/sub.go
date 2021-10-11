@@ -39,12 +39,18 @@ func NotifySub() {
 	wordsAndContentsMap, subWords := GetFilterSubWordsAndContents(allSubWordsArr)
 	log.Println(wordsAndContentsMap)
 	log.Println(subWords)
-	var subModels model.Sub
+	var allSubModels [][]model.Sub
 	for i := 0; i < len(subWords); i++ {
+		var subModels []model.Sub
 		inital.GDB.Raw(`SELECT * FROM sub WHERE JSON_CONTAINS(sub_words, ?)`, "\""+subWords[i]+"\"").Scan(&subModels)
-		log.Println(subModels)
+		allSubModels = append(allSubModels, subModels)
 	}
-
+	for i := 0; i < len(allSubModels); i++ {
+		subs := allSubModels[i]
+		for j := 0; j < len(subs); j++ {
+			log.Println(subs[j].Phone)
+		}
+	}
 }
 
 // GetFilterSubWordsAndContents 传入所有的订阅词汇, 返回符合的订阅词汇和热搜内容
