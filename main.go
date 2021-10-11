@@ -41,6 +41,13 @@ func main() {
 		fmt.Println("配置文件初始化失败")
 	}
 
+	inital.GDB = inital.InitDB()
+	if inital.VP == nil {
+		fmt.Println("数据库连接失败")
+	}
+
+	utils.GetAllSubWords()
+
 	response, err := http.Get("https://hs.hellozwz.com/hot-searches/current")
 	if err != nil {
 		log.Println("请求失败")
@@ -88,7 +95,7 @@ func main() {
 		}
 	}
 	log.Println(filterWordsArr)
-	utils.GetAllSubWords()
+
 }
 
 func contentsProgress(subWordsArr, contentsArr []string) []string {
