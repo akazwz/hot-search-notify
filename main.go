@@ -65,7 +65,11 @@ func main() {
 		content := searches[i].Content
 		contentsArr = append(contentsArr, content)
 	}
-	subWordsArr := []string{"王嘉尔", "真的", "假的", "", "好"}
+	subWordsArr := []string{
+		"王嘉尔",
+		"真的",
+		"假的",
+	}
 	filterWordsArr := contentsProgress(subWordsArr, contentsArr)
 	for i := 0; i < len(contentsArr); i++ {
 		for j := 0; j < len(filterWordsArr); j++ {
@@ -75,6 +79,7 @@ func main() {
 			}
 		}
 	}
+	log.Println(filterWordsArr)
 }
 
 func contentsProgress(subWordsArr, contentsArr []string) []string {
