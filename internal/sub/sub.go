@@ -2,15 +2,16 @@ package sub
 
 import (
 	"encoding/json"
-	"github.com/akazwz/hot-search-notify/inital"
-	"github.com/akazwz/hot-search-notify/internal/utils"
-	"github.com/akazwz/hot-search-notify/model"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
+
+	"github.com/akazwz/hot-search-notify/inital"
+	"github.com/akazwz/hot-search-notify/internal/utils"
+	"github.com/akazwz/hot-search-notify/model"
 )
 
 type Res struct {

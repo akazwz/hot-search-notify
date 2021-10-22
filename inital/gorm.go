@@ -2,10 +2,11 @@ package inital
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/akazwz/hot-search-notify/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 func InitDB() *gorm.DB {
