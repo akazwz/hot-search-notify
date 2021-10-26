@@ -14,7 +14,15 @@ func GetAllSubWords() []string {
 	log.Println(allWords)
 	allWords = strings.ReplaceAll(allWords, "[", "")
 	allWords = strings.ReplaceAll(allWords, "]", "")
-	return strings.Split(allWords, ",")
+	allWords = strings.ReplaceAll(allWords, `"`, "")
+	log.Println(allWords)
+	arrBefore := strings.Split(allWords, ",")
+	var arrReturn []string
+	for i := 0; i < len(arrBefore); i++ {
+		arrReturn = append(arrReturn, strings.TrimSpace(arrBefore[i]))
+	}
+	log.Println(arrReturn)
+	return arrReturn
 }
 
 func GetFilterUserInfo() {

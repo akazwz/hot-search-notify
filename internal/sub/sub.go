@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/akazwz/hot-search-notify/internal/utils"
@@ -112,18 +111,31 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (map[string][]string, []
 
 // 获取热搜包含的订阅词汇
 func getFilterWords(subWordsArr, contentsArr []string) []string {
-	log.Println("sub words:")
-	log.Println(subWordsArr)
-	log.Println("content arr:")
-	log.Println(contentsArr)
-	log.Println("find string arr:")
-	log.Println(strings.Join(contentsArr, "|"))
 	filterArr := make([]string, 0)
-	for j := 0; j < len(subWordsArr); j++ {
-		filterStr := regexp.MustCompile(subWordsArr[j]).FindString(strings.Join(contentsArr, "|"))
-		if len(filterStr) > 0 {
-			filterArr = append(filterArr, filterStr)
+	for i := 0; i < len(contentsArr); i++ {
+		for j := 0; j < len(subWordsArr); j++ {
+			contains := strings.Contains(contentsArr[i], subWordsArr[j])
+			if contains {
+				filterArr = append(filterArr, subWordsArr[j])
+			}
 		}
 	}
-	return filterArr
+	return RemoveRepByLoop(filterArr)
+}
+
+func RemoveRepByLoop(slc []string) []string {
+	var result []string // 存放结果
+	for i := range slc {
+		flag := true
+		for j := range result {
+			if slc[i] == result[j] {
+				flag = false // 存在重复元素，标识为false
+				break
+			}
+		}
+		if flag { // 标识为false，不添加进结果
+			result = append(result, slc[i])
+		}
+	}
+	return result
 }
