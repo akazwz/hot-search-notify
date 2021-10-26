@@ -10,7 +10,10 @@ import (
 
 func GetAllSubWords() []string {
 	var allWords string
-	inital.GDB.Raw("SELECT GROUP_CONCAT(sub_word) FROM all_sub_words").Scan(&allWords)
+	inital.GDB.Raw("SELECT GROUP_CONCAT(sub_words) FROM sub").Scan(&allWords)
+	log.Println(allWords)
+	allWords = strings.ReplaceAll(allWords, "[", "")
+	allWords = strings.ReplaceAll(allWords, "]", "")
 	return strings.Split(allWords, ",")
 }
 

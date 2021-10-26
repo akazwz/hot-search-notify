@@ -2,6 +2,8 @@ package sub
 
 import (
 	"encoding/json"
+	"github.com/akazwz/hot-search-notify/inital"
+	"github.com/akazwz/hot-search-notify/model"
 	"io"
 	"io/ioutil"
 	"log"
@@ -9,9 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/akazwz/hot-search-notify/inital"
 	"github.com/akazwz/hot-search-notify/internal/utils"
-	"github.com/akazwz/hot-search-notify/model"
 )
 
 type Res struct {
@@ -49,7 +49,7 @@ func NotifySub() {
 	for i := 0; i < len(allSubModels); i++ {
 		subs := allSubModels[i]
 		for j := 0; j < len(subs); j++ {
-			log.Println(subs[j].Phone)
+			log.Println(subs[j].SubWords)
 		}
 	}
 }
@@ -82,6 +82,7 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (map[string][]string, []
 	}
 	// 热搜数组
 	searches := res.Data.Searches
+	log.Println(searches)
 	// 储存热搜内容数组
 	contentsArr := make([]string, 0)
 	for i := 0; i < len(searches); i++ {
@@ -111,6 +112,12 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (map[string][]string, []
 
 // 获取热搜包含的订阅词汇
 func getFilterWords(subWordsArr, contentsArr []string) []string {
+	log.Println("sub words:")
+	log.Println(subWordsArr)
+	log.Println("content arr:")
+	log.Println(contentsArr)
+	log.Println("find string arr:")
+	log.Println(strings.Join(contentsArr, "|"))
 	filterArr := make([]string, 0)
 	for j := 0; j < len(subWordsArr); j++ {
 		filterStr := regexp.MustCompile(subWordsArr[j]).FindString(strings.Join(contentsArr, "|"))
