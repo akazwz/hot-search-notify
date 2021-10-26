@@ -16,7 +16,7 @@ func main() {
 
 	inital.GDB = inital.InitDB()
 	if inital.GDB != nil {
-		inital.CreateTables(inital.GDB)
+		//inital.CreateTables(inital.GDB)
 		db, _ := inital.GDB.DB()
 		defer func(db *sql.DB) {
 			err := db.Close()

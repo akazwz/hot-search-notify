@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/akazwz/hot-search-notify/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -34,10 +33,7 @@ func InitDB() *gorm.DB {
 }
 
 func CreateTables(db *gorm.DB) {
-	err := db.AutoMigrate(
-		model.Sub{},
-		model.AllSubWords{},
-	)
+	err := db.AutoMigrate()
 	if err != nil {
 		log.Println("create table error")
 	}

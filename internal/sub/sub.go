@@ -3,7 +3,6 @@ package sub
 import (
 	"encoding/json"
 	"github.com/akazwz/hot-search-notify/inital"
-	"github.com/akazwz/hot-search-notify/model"
 	"io"
 	"io/ioutil"
 	"log"
@@ -35,22 +34,35 @@ type SingleHotSearch struct {
 
 func NotifySub() {
 	allSubWordsArr := utils.GetAllSubWords()
-	log.Println("所有订阅词汇:", allSubWordsArr)
 	wordsAndContentsMap, subWords := GetFilterSubWordsAndContents(allSubWordsArr)
 	log.Println(wordsAndContentsMap)
-	log.Println(subWords)
-	var allSubModels [][]model.Sub
+	var allUuids [][]string
 	for i := 0; i < len(subWords); i++ {
-		var subModels []model.Sub
-		inital.GDB.Raw(`SELECT * FROM sub WHERE JSON_CONTAINS(sub_words, ?)`, "\""+subWords[i]+"\"").Scan(&subModels)
-		allSubModels = append(allSubModels, subModels)
+		var uuids []string
+		inital.GDB.Raw(`SELECT user_uuid FROM sub WHERE JSON_CONTAINS(sub_words, ?)`, "\""+subWords[i]+"\"").Scan(&uuids)
+		allUuids = append(allUuids, uuids)
 	}
-	for i := 0; i < len(allSubModels); i++ {
-		subs := allSubModels[i]
-		for j := 0; j < len(subs); j++ {
-			log.Println(subs[j].SubWords)
+
+	var uuids []string
+	for i := 0; i < len(allUuids); i++ {
+		uuid := allUuids[i]
+		for j := 0; j < len(uuid); j++ {
+			uuids = append(uuids, uuid[j])
 		}
 	}
+
+	// 去重 uuids
+	uuids = RemoveRepByLoop(uuids)
+
+	var openIds []string
+	for i := 0; i < len(uuids); i++ {
+		var openID string
+		inital.GDB.Raw(`SELECT open_id FROM user WHERE (uuid = ?)`, uuids[i]).Limit(1).Scan(&openID)
+		openIds = append(openIds, openID)
+	}
+
+	// 获取应该通知的用户的 uuid
+	log.Println(openIds)
 }
 
 // GetFilterSubWordsAndContents 传入所有的订阅词汇, 返回符合的订阅词汇和热搜内容
@@ -81,7 +93,6 @@ func GetFilterSubWordsAndContents(subWordsArr []string) (map[string][]string, []
 	}
 	// 热搜数组
 	searches := res.Data.Searches
-	log.Println(searches)
 	// 储存热搜内容数组
 	contentsArr := make([]string, 0)
 	for i := 0; i < len(searches); i++ {
