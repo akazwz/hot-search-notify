@@ -3,8 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/akazwz/hot-search-notify/inital"
 	"github.com/akazwz/hot-search-notify/internal/sub"
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -27,5 +31,23 @@ func main() {
 		fmt.Println("数据库连接失败")
 		return
 	}
-	sub.NotifySub()
+
+	//generatePDF(fmt.Sprintf("%s", time.Now().Format("2006-01-02-15-04-05")))
+	location, err := time.LoadLocation("Asia/Shanghai")
+	if err != nil {
+		log.Fatal("时区加载失败")
+	}
+
+	// 开启定时任务
+	c := cron.New(cron.WithLocation(location))
+	_, err = c.AddFunc("0 15 30 45 * * * * ", func() {
+		log.Println("")
+		sub.NotifySub()
+	})
+
+	if err != nil {
+		log.Fatal("定时任务添加失败", err)
+	}
+	c.Run()
+	c.Start()
 }

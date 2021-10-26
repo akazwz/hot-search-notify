@@ -4,7 +4,9 @@ go 1.16
 
 require (
 	github.com/go-sql-driver/mysql v1.6.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/silenceper/wechat/v2 v2.0.9
 	github.com/spf13/viper v1.9.0
 	gorm.io/datatypes v1.0.2
 	gorm.io/driver/mysql v1.1.2

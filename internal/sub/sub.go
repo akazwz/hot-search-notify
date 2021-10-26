@@ -63,6 +63,9 @@ func NotifySub() {
 
 	// 获取应该通知的用户的 uuid
 	log.Println(openIds)
+	for i := 0; i < len(openIds); i++ {
+		utils.SendMsg(openIds[i])
+	}
 }
 
 // GetFilterSubWordsAndContents 传入所有的订阅词汇, 返回符合的订阅词汇和热搜内容
