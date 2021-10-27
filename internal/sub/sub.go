@@ -57,8 +57,18 @@ func NotifySub() {
 	openIds := make(map[string]string)
 	for i := 0; i < len(uuids); i++ {
 		var openID string
-		inital.GDB.Raw(`SELECT open_id FROM user WHERE (uuid = ?)`, uuids[i]).Limit(1).Scan(&openID)
-		openIds[uuids[i]] = openID
+		// 查询符合条件的 openid
+		inital.GDB.Table("user").
+			Select("user.open_id as open_id").
+			Joins("left join notify on user.uuid = notify.user_uuid").
+			Where("user.uuid = ?", uuids[i]).
+			Where("notify.user_uuid = ?", uuids[i]).
+			Scan(&openID)
+		log.Println("open id :", openID)
+		// 符合条件的放入 map
+		if len(openID) > 1 {
+			openIds[uuids[i]] = openID
+		}
 	}
 
 	log.Println(openIds)

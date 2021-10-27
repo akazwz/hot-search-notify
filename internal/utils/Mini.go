@@ -1,9 +1,11 @@
 package utils
 
 import (
-	"github.com/akazwz/hot-search-notify/inital"
 	"log"
+	"time"
 
+	"github.com/akazwz/hot-search-notify/inital"
+	"github.com/akazwz/hot-search-notify/model"
 	"github.com/silenceper/wechat/v2"
 	"github.com/silenceper/wechat/v2/cache"
 	"github.com/silenceper/wechat/v2/miniprogram/config"
@@ -48,6 +50,15 @@ func SendMsg(userUUID, openId string) {
 		log.Println(err)
 		return
 	}
-	//inital.GDB.Create()
-
+	var notify model.Notify
+	// 数据库更新通知次数和上次通知时间
+	err = inital.GDB.Where("user_uuid = ?", userUUID).First(&notify).Updates(&model.Notify{
+		NotifyCount:    notify.NotifyCount + 1,
+		AllNotifyCount: notify.AllNotifyCount + 1,
+		LastNotify:     time.Now(),
+	}).Error
+	if err != nil {
+		log.Println("通知成功,存入数据库失败")
+		return
+	}
 }
