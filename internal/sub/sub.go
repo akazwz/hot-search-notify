@@ -57,26 +57,21 @@ func NotifySub() {
 	openIds := make(map[string]string)
 	for i := 0; i < len(uuids); i++ {
 		var openID string
-		// 查询符合条件的 openid
-		inital.GDB.Table("user").
+		// 查询符合条件的 openid (uuid 上次通知距离现在间隔 >= 用户设置的间隔)
+		inital.GDB.Debug().Table("user").
 			Select("user.open_id as open_id").
 			Joins("left join notify on user.uuid = notify.user_uuid").
 			Where("user.uuid = ?", uuids[i]).
 			Where("notify.user_uuid = ?", uuids[i]).
+			Where("(SELECT TIMESTAMPDIFF(MINUTE,notify.last_notify,NOW()) FROM notify) >= notify.notify_gap").
+			Limit(1).
 			Scan(&openID)
-		log.Println("open id :", openID)
 		// 符合条件的放入 map
 		if len(openID) > 1 {
 			openIds[uuids[i]] = openID
 		}
 	}
 
-	log.Println(openIds)
-	// 获取应该通知的用户的 uuid
-	/*log.Println(openIds)
-	for i := 0; i < len(openIds); i++ {
-		utils.SendMsg(openIds[i])
-	}*/
 	for uuid, openid := range openIds {
 		utils.SendMsg(uuid, openid)
 	}
