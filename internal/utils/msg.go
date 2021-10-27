@@ -10,9 +10,13 @@ import (
 	"github.com/silenceper/wechat/v2/cache"
 	"github.com/silenceper/wechat/v2/miniprogram/config"
 	"github.com/silenceper/wechat/v2/miniprogram/subscribe"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
+	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
+	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20210111"
 )
 
-func SendMsg(userUUID, openId string) {
+func SendMiniMsg(userUUID, openId string) {
 	wc := wechat.NewWechat()
 	memory := cache.NewMemory()
 	cfg := &config.Config{
@@ -62,4 +66,36 @@ func SendMsg(userUUID, openId string) {
 		log.Println("通知成功,存入数据库失败")
 		return
 	}
+}
+
+func SendSMS(phone string) {
+	credential := common.NewCredential(inital.CFG.Tencent.SecretId, inital.CFG.Tencent.SecretKey)
+
+	cpf := profile.NewClientProfile()
+	cpf.SignMethod = "HmacSHA1"
+
+	client, _ := sms.NewClient(credential, "ap-guangzhou", cpf)
+
+	request := sms.NewSendSmsRequest()
+
+	request.SmsSdkAppId = common.StringPtr("1400576425")
+	request.SignName = common.StringPtr("赵文卓工作学习")
+	request.SenderId = common.StringPtr("")
+	request.ExtendCode = common.StringPtr("")
+	request.TemplateParamSet = common.StringPtrs([]string{})
+	request.TemplateId = common.StringPtr("1131592")
+	request.PhoneNumberSet = common.StringPtrs([]string{phone})
+
+	_, err := client.SendSms(request)
+
+	if _, ok := err.(*errors.TencentCloudSDKError); ok {
+		log.Printf("An API error has returned: %s", err)
+		return
+	}
+	// 非SDK异常，直接失败。实际代码中可以加入其他的处理。
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	return
 }

@@ -13,12 +13,6 @@ type Sub struct {
 	SubWords datatypes.JSON `json:"sub_words"`
 }
 
-/*type AllSubWords struct {
-	Model
-	UserUUID uuid.UUID      `json:"user_uuid"`
-	SubWords datatypes.JSON `json:"sub_words"`
-}*/
-
 type Model struct {
 	ID        uint      `json:"id" gorm:"primary_key"`
 	CreatedAt time.Time `json:"created_at" gorm:"created_at"`

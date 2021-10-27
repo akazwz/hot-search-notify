@@ -2,9 +2,9 @@ package inital
 
 import (
 	"fmt"
-	"github.com/akazwz/hot-search-notify/model"
 	"log"
 
+	"github.com/akazwz/hot-search-notify/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )

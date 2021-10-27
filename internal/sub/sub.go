@@ -73,7 +73,7 @@ func NotifySub() {
 	}
 
 	for uuid, openid := range openIds {
-		utils.SendMsg(uuid, openid)
+		utils.SendMiniMsg(uuid, openid)
 	}
 }
 
