@@ -32,6 +32,11 @@ type SingleHotSearch struct {
 	Icon    string `json:"icon"`
 }
 
+type NotifyInfo struct {
+	OpenId string `json:"open_id"`
+	Phone  string `json:"phone"`
+}
+
 func NotifySub() {
 	allSubWordsArr := utils.GetAllSubWords()
 	wordsAndContentsMap, subWords := GetFilterSubWordsAndContents(allSubWordsArr)
@@ -54,26 +59,29 @@ func NotifySub() {
 	// 去重 uuids
 	uuids = RemoveRepByLoop(uuids)
 
-	openIds := make(map[string]string)
+	infos := make(map[string]NotifyInfo)
 	for i := 0; i < len(uuids); i++ {
-		var openID string
-		// 查询符合条件的 openid (uuid 上次通知距离现在间隔 >= 用户设置的间隔)
+		var info NotifyInfo
+		// 查询符合条件的 用户信息 (uuid 上次通知距离现在间隔 >= 用户设置的间隔 通知次数小于通知次数限制 )
 		inital.GDB.Debug().Table("user").
-			Select("user.open_id as open_id").
+			Select("user.open_id as open_id, user.phone as phone").
 			Joins("left join notify on user.uuid = notify.user_uuid").
 			Where("user.uuid = ?", uuids[i]).
 			Where("notify.user_uuid = ?", uuids[i]).
+			Where("notify.notify_count < notify.notify_limit_count").
 			Where("(SELECT TIMESTAMPDIFF(MINUTE,notify.last_notify,NOW()) FROM notify) >= notify.notify_gap").
 			Limit(1).
-			Scan(&openID)
+			Scan(&info)
 		// 符合条件的放入 map
-		if len(openID) > 1 {
-			openIds[uuids[i]] = openID
+		if len(info.OpenId) > 1 || len(info.Phone) > 1 {
+			infos[uuids[i]] = info
 		}
 	}
 
-	for uuid, openid := range openIds {
-		utils.SendMiniMsg(uuid, openid)
+	for uuid, info := range infos {
+		if len(info.OpenId) > 1 {
+			utils.SendMiniMsg(uuid, info.OpenId)
+		}
 	}
 }
 
