@@ -20,7 +20,7 @@ func main() {
 
 	inital.GDB = inital.InitDB()
 	if inital.GDB != nil {
-		//inital.CreateTables(inital.GDB)
+		inital.CreateTables(inital.GDB)
 		db, _ := inital.GDB.DB()
 		defer func(db *sql.DB) {
 			err := db.Close()
@@ -40,7 +40,7 @@ func main() {
 
 	// 开启定时任务
 	c := cron.New(cron.WithLocation(location))
-	_, err = c.AddFunc("0 15 30 45 * * * * ", func() {
+	_, err = c.AddFunc("* * * * * ", func() {
 		log.Println("")
 		sub.NotifySub()
 	})

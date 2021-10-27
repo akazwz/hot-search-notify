@@ -54,17 +54,21 @@ func NotifySub() {
 	// 去重 uuids
 	uuids = RemoveRepByLoop(uuids)
 
-	var openIds []string
+	openIds := make(map[string]string)
 	for i := 0; i < len(uuids); i++ {
 		var openID string
 		inital.GDB.Raw(`SELECT open_id FROM user WHERE (uuid = ?)`, uuids[i]).Limit(1).Scan(&openID)
-		openIds = append(openIds, openID)
+		openIds[uuids[i]] = openID
 	}
 
-	// 获取应该通知的用户的 uuid
 	log.Println(openIds)
+	// 获取应该通知的用户的 uuid
+	/*log.Println(openIds)
 	for i := 0; i < len(openIds); i++ {
 		utils.SendMsg(openIds[i])
+	}*/
+	for uuid, openid := range openIds {
+		utils.SendMsg(uuid, openid)
 	}
 }
 

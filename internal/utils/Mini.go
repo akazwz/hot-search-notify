@@ -10,7 +10,7 @@ import (
 	"github.com/silenceper/wechat/v2/miniprogram/subscribe"
 )
 
-func SendMsg(openId string) {
+func SendMsg(userUUID, openId string) {
 	wc := wechat.NewWechat()
 	memory := cache.NewMemory()
 	cfg := &config.Config{
@@ -48,4 +48,6 @@ func SendMsg(openId string) {
 		log.Println(err)
 		return
 	}
+	//inital.GDB.Create()
+
 }
