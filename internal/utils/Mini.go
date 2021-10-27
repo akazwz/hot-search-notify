@@ -43,10 +43,11 @@ func SendMsg(userUUID, openId string) {
 		ToUser:     openId,
 		TemplateID: "XV16ZyG6Af_gG8D4qg7M17Fw23m_zYWNo689XpJKYQE",
 		Data:       data,
+		Page:       "pages/sub/index",
 	}
 	err := sub.Send(msg)
 	if err != nil {
-		log.Println("send error")
+		log.Println("通知失败")
 		log.Println(err)
 		return
 	}
